@@ -37,7 +37,7 @@ export function GameCard({ game, index, onPlay }: GameCardProps) {
           initial={{ x: -10 }}
           whileHover={{ x: 0 }}
         >
-          <Button size="sm" className="gradient-primary rounded-full">
+          <Button size="sm" className="gradient-primary text-white rounded-full">
             <Play className="w-3 h-3 mr-1" />
             Play
           </Button>

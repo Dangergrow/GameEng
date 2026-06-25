@@ -88,11 +88,11 @@
   }
 
   .gradient-primary {
-    @apply bg-gradient-to-r from-primary-600 to-primary-500;
+    @apply bg-gradient-to-r from-primary-600 to-primary-500 text-white dark:from-primary-500 dark:to-primary-400;
   }
 
   .gradient-secondary {
-    @apply bg-gradient-to-r from-secondary-600 to-secondary-500;
+    @apply bg-gradient-to-r from-secondary-600 to-secondary-500 text-white dark:from-secondary-500 dark:to-secondary-400;
   }
 
   .gradient-border {

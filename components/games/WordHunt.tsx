@@ -49,26 +49,32 @@ function findWordsInGrid(grid: string[][], minLen: number, wordBank: string[]): 
   const found = new Set<string>();
   const wordSet = new Set(wordBank.map((w) => w.toLowerCase()));
 
-  function dfs(row: number, col: number, path: string, visited: boolean[][]) {
-    if (row < 0 || row >= size || col < 0 || col >= size || visited[row][col]) return;
-    path += grid[row][col].toLowerCase();
-    visited[row][col] = true;
+  for (const word of wordSet) {
+    if (word.length < minLen || word.length > size * 2) continue;
+    if (found.has(word)) continue;
 
-    if (path.length >= minLen && wordSet.has(path)) {
-      found.add(path);
-    }
+    for (let r = 0; r < size; r++) {
+      for (let c = 0; c < size; c++) {
+        if (grid[r][c].toLowerCase() !== word[0]) continue;
 
-    if (path.length < 8) {
-      for (const [dr, dc] of DIRECTIONS) {
-        dfs(row + dr, col + dc, path, visited.map((r) => [...r]));
+        for (const [dr, dc] of DIRECTIONS) {
+          let match = true;
+          for (let i = 1; i < word.length; i++) {
+            const nr = r + dr * i;
+            const nc = c + dc * i;
+            if (nr < 0 || nr >= size || nc < 0 || nc >= size || grid[nr][nc].toLowerCase() !== word[i]) {
+              match = false;
+              break;
+            }
+          }
+          if (match) {
+            found.add(word);
+            break;
+          }
+        }
+        if (found.has(word)) break;
       }
-    }
-  }
-
-  for (let r = 0; r < size; r++) {
-    for (let c = 0; c < size; c++) {
-      const visited = grid.map((row) => row.map(() => false));
-      dfs(r, c, "", visited);
+      if (found.has(word)) break;
     }
   }
 
