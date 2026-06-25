@@ -234,8 +234,7 @@ export function DictionaryDialog({
                     </Button>
                   </div>
 
-                  <div className="flex-1 min-h-0 rounded-lg border border-gray-200 dark:border-white/10">
-                    <ScrollArea className="h-full">
+                  <ScrollArea className="flex-1 min-h-0 border rounded-lg border-gray-200 dark:border-white/10">
                       <div className="space-y-1 pr-2">
                         <AnimatePresence>
                           {filteredLearned.map((item, i) => (
@@ -278,7 +277,6 @@ export function DictionaryDialog({
                       )}
                     </div>
                   </ScrollArea>
-                  </div>
                 </>
               )}
             </TabsContent>
