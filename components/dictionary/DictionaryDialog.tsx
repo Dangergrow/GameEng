@@ -10,6 +10,8 @@ import {
   RotateCcw,
   X,
   AlertTriangle,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -50,6 +52,8 @@ export function DictionaryDialog({
   const [searchQuery, setSearchQuery] = useState("");
   const [confirmReset, setConfirmReset] = useState(false);
   const [studyWords, setStudyWords] = useState<typeof commonWords>([]);
+  const [learnedPage, setLearnedPage] = useState(0);
+  const ITEMS_PER_PAGE = 30;
 
   const learnedCount = learnedWords.length;
   const progressPercent = COMMON_WORDS_TOTAL > 0
@@ -89,6 +93,16 @@ export function DictionaryDialog({
         w.translation.toLowerCase().includes(q)
     );
   }, [learnedWords, searchQuery]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredLearned.length / ITEMS_PER_PAGE));
+  const paginatedLearned = filteredLearned.slice(
+    learnedPage * ITEMS_PER_PAGE,
+    (learnedPage + 1) * ITEMS_PER_PAGE
+  );
+
+  useEffect(() => {
+    setLearnedPage(0);
+  }, [searchQuery]);
 
   return (
     <>
@@ -234,10 +248,10 @@ export function DictionaryDialog({
                     </Button>
                   </div>
 
-                  <ScrollArea className="flex-1 min-h-0 border rounded-lg border-gray-200 dark:border-white/10">
-                      <div className="space-y-1 pr-2">
+                  <div className="flex-1 min-h-0 overflow-y-auto border rounded-lg border-gray-200 dark:border-white/10">
+                      <div className="space-y-1 p-1 pr-2">
                         <AnimatePresence>
-                          {filteredLearned.map((item, i) => (
+                          {paginatedLearned.map((item, i) => (
                           <motion.div
                             key={item.word}
                             initial={{ opacity: 0, height: 0 }}
@@ -276,7 +290,31 @@ export function DictionaryDialog({
                         </div>
                       )}
                     </div>
-                  </ScrollArea>
+                  </div>
+
+                  {totalPages > 1 && (
+                    <div className="flex items-center justify-center gap-3 pt-2 pb-1">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setLearnedPage((p) => Math.max(0, p - 1))}
+                        disabled={learnedPage === 0}
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                      </Button>
+                      <span className="text-sm text-gray-500 dark:text-white/50 font-mono">
+                        {learnedPage + 1} / {totalPages}
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setLearnedPage((p) => Math.min(totalPages - 1, p + 1))}
+                        disabled={learnedPage >= totalPages - 1}
+                      >
+                        <ChevronRight className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  )}
                 </>
               )}
             </TabsContent>
