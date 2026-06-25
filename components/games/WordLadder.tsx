@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Check, X, ChevronRight, Lightbulb } from "lucide-react";
+import { ArrowRight, ChevronRight, Lightbulb } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -18,12 +18,33 @@ const HINT_PENALTY = 5;
 interface Puzzle {
   start: string;
   target: string;
-  bestPath: string[];
 }
 
-function getRandomWord(bank: string[], length: number): string {
-  const filtered = bank.filter((w) => w.length === length);
-  return filtered[Math.floor(Math.random() * filtered.length)] || bank[0];
+const PUZZLES: Puzzle[] = [
+  { start: "cat", target: "dog" },
+  { start: "cold", target: "warm" },
+  { start: "hand", target: "foot" },
+  { start: "love", target: "hate" },
+  { start: "life", target: "death" },
+  { start: "hard", target: "soft" },
+  { start: "dark", target: "light" },
+  { start: "rich", target: "poor" },
+  { start: "fast", target: "slow" },
+  { start: "warm", target: "cool" },
+  { start: "team", target: "work" },
+  { start: "ship", target: "dock" },
+  { start: "fire", target: "burn" },
+  { start: "tree", target: "wood" },
+  { start: "king", target: "lord" },
+];
+
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
 }
 
 function differsByOne(a: string, b: string): boolean {
@@ -34,44 +55,6 @@ function differsByOne(a: string, b: string): boolean {
     if (diffs > 1) return false;
   }
   return diffs === 1;
-}
-
-function findShortestPath(start: string, target: string, wordSet: Set<string>): string[] | null {
-  const queue: { word: string; path: string[] }[] = [{ word: start, path: [start] }];
-  const visited = new Set<string>([start]);
-
-  while (queue.length > 0) {
-    const { word, path } = queue.shift()!;
-    if (word === target) return path;
-
-    for (const next of wordSet) {
-      if (visited.has(next)) continue;
-      if (differsByOne(word, next)) {
-        visited.add(next);
-        queue.push({ word: next, path: [...path, next] });
-      }
-    }
-  }
-  return null;
-}
-
-function generatePuzzle(length: number, wordBank: string[]): Puzzle | null {
-  const words = [...new Set(wordBank.map((w) => w.toLowerCase()))].filter((w) => w.length === length);
-  if (words.length < 10) return null;
-
-  const wordSet = new Set(words);
-
-  for (let attempt = 0; attempt < 200; attempt++) {
-    const start = getRandomWord(words, length);
-    const target = getRandomWord(words, length);
-    if (start === target) continue;
-
-    const path = findShortestPath(start, target, wordSet);
-    if (path && path.length >= 3 && path.length <= 6) {
-      return { start, target, bestPath: path };
-    }
-  }
-  return null;
 }
 
 export function WordLadder() {
@@ -98,20 +81,13 @@ export function WordLadder() {
   }, [startTime]);
 
   const startNewRound = useCallback(() => {
-    const bank = wordBanks.intermediate.map((w) => w.word);
-    for (let attempt = 0; attempt < 50; attempt++) {
-      const wordLen = 4 + Math.floor(Math.random() * 2);
-      const p = generatePuzzle(wordLen, bank);
-      if (p) {
-        setPuzzle(p);
-        setUserPath([p.start]);
-        setCurrentInput("");
-        setFeedback(null);
-        setHintsUsed(0);
-        return;
-      }
-    }
-    setFeedback({ type: "wrong", msg: "Не удалось сгенерировать головоломку. Попробуй другую игру." });
+    const shuffled = shuffle(PUZZLES);
+    const p = shuffled[0];
+    setPuzzle(p);
+    setUserPath([p.start]);
+    setCurrentInput("");
+    setFeedback(null);
+    setHintsUsed(0);
   }, []);
 
   useEffect(() => {
@@ -194,14 +170,13 @@ export function WordLadder() {
   const showHint = () => {
     if (!puzzle || gameOver) return;
     setHintsUsed((h) => h + 1);
-    const nextStep = puzzle.bestPath[puzzle.bestPath.indexOf(userPath[userPath.length - 1]) + 1];
-    if (nextStep) {
-      const letter = nextStep[0];
-      setCurrentInput(letter.repeat(puzzle.start.length));
-      setTimeout(() => {
-        setCurrentInput("");
-        setFeedback({ type: "correct", msg: `Подсказка: слово начинается на «${letter}...» (-${HINT_PENALTY} очков)` });
-      }, 500);
+    const lastWord = userPath[userPath.length - 1];
+    const bank = wordBanks.intermediate.map((w) => w.word.toLowerCase());
+    const neighbor = bank.find((w) => differsByOne(lastWord, w) && !userPath.includes(w) && w !== puzzle.target);
+    if (neighbor) {
+      setFeedback({ type: "correct", msg: `Подсказка: попробуй «${neighbor}» (-${HINT_PENALTY} очков)` });
+    } else {
+      setFeedback({ type: "invalid", msg: "Нет подходящего слова. Попробуй сам!" });
     }
   };
 
