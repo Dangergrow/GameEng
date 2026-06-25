@@ -99,17 +99,19 @@ export function WordLadder() {
 
   const startNewRound = useCallback(() => {
     const bank = wordBanks.intermediate.map((w) => w.word);
-    const wordLen = 4 + Math.floor(Math.random() * 2);
-    const p = generatePuzzle(wordLen, bank);
-    if (p) {
-      setPuzzle(p);
-      setUserPath([p.start]);
-      setCurrentInput("");
-      setFeedback(null);
-      setHintsUsed(0);
-    } else {
-      startNewRound();
+    for (let attempt = 0; attempt < 50; attempt++) {
+      const wordLen = 4 + Math.floor(Math.random() * 2);
+      const p = generatePuzzle(wordLen, bank);
+      if (p) {
+        setPuzzle(p);
+        setUserPath([p.start]);
+        setCurrentInput("");
+        setFeedback(null);
+        setHintsUsed(0);
+        return;
+      }
     }
+    setFeedback({ type: "wrong", msg: "Не удалось сгенерировать головоломку. Попробуй другую игру." });
   }, []);
 
   useEffect(() => {
