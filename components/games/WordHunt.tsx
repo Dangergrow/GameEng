@@ -76,20 +76,20 @@ function findWordsInGrid(grid: string[][], minLen: number, wordBank: string[]): 
 }
 
 function generateGrid(difficulty: Difficulty): { grid: string[][]; possibleWords: string[] } {
-  const size = GRID_SIZE[difficulty];
-  const minLen = MIN_WORD_LENGTH[difficulty];
-  const words = getWordsForDifficulty(difficulty, 50).map((w) => w.word.toLowerCase());
-  const shortWords = words.filter((w) => w.length >= minLen && w.length <= size + 2);
-
+  const size = GRID_SIZE[difficulty] ?? 4;
+  const minLen = MIN_WORD_LENGTH[difficulty] ?? 4;
   const consonants = "bcdfghjklmnpqrstvwxyz";
   const vowels = "aeiou";
+
+  try {
+    const words = getWordsForDifficulty(difficulty, 50).map((w) => w.word.toLowerCase());
+    const shortWords = words.filter((w) => w.length >= minLen && w.length <= size * 2);
 
   for (let attempt = 0; attempt < 200; attempt++) {
     const grid: string[][] = Array.from({ length: size }, () => Array(size).fill(""));
     const seeded = new Set<string>();
 
     const candidates = shortWords.sort(() => Math.random() - 0.5);
-    const roomToWork = Math.floor(size * size * 0.7);
 
     for (const word of candidates) {
       if (seeded.size >= 4) break;
@@ -136,6 +136,9 @@ function generateGrid(difficulty: Difficulty): { grid: string[][]; possibleWords
     if (possibleWords.length >= 4) {
       return { grid, possibleWords };
     }
+  }
+  } catch {
+    // Fall through to fallback
   }
 
   const fallback = consonants + vowels;
