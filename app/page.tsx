@@ -20,6 +20,9 @@ import { PhraseBlast } from "@/components/games/PhraseBlast";
 import { SynonymClash } from "@/components/games/SynonymClash";
 import { DialogueBuilder } from "@/components/games/DialogueBuilder";
 import { ColorsNumbers } from "@/components/games/ColorsNumbers";
+import { WordLadder } from "@/components/games/WordLadder";
+import { MemoryMatch } from "@/components/games/MemoryMatch";
+import { AnagramScramble } from "@/components/games/AnagramScramble";
 import { gameConfigs } from "@/lib/gameConfigs";
 import { useGameStore } from "@/store/gameStore";
 
@@ -35,6 +38,9 @@ const gameComponents = {
   synonymclash: SynonymClash,
   dialoguebuilder: DialogueBuilder,
   colorsnumbers: ColorsNumbers,
+  wordladder: WordLadder,
+  memorymatch: MemoryMatch,
+  anagramscramble: AnagramScramble,
 };
 
 export default function Home() {

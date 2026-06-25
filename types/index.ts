@@ -1,6 +1,6 @@
 export type Difficulty = "beginner" | "intermediate" | "advanced";
 
-export type GameId = "wordvault" | "grammarforge" | "echochamber" | "spellstorm" | "idiomlab" | "wordhunt" | "tenseportal" | "phraseblast" | "synonymclash" | "dialoguebuilder" | "colorsnumbers";
+export type GameId = "wordvault" | "grammarforge" | "echochamber" | "spellstorm" | "idiomlab" | "wordhunt" | "tenseportal" | "phraseblast" | "synonymclash" | "dialoguebuilder" | "colorsnumbers" | "wordladder" | "memorymatch" | "anagramscramble";
 
 export interface WordEntry {
   word: string;
